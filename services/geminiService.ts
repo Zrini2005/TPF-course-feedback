@@ -1,13 +1,13 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Course, Review } from "../types";
 
 // Always use process.env.API_KEY directly and exclusively.
 const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
-const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export async function getCourseSummary(course: Course, reviews: Review[]) {
-  if (!ai) {
+  if (!genAI) {
     return "AI summary unavailable. API key not configured.";
   }
 
@@ -43,11 +43,10 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-8b",
-      contents: prompt,
-    });
-    return response.text || "Summary analysis not available.";
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text() || "Summary analysis not available.";
   } catch (error) {
     console.error("Gemini Error:", error);
     return "The AI is currently processing other academic data. Please check back later.";
@@ -55,7 +54,7 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
 }
 
 export async function askAboutCourse(question: string, course: Course, reviews: Review[]) {
-  if (!ai) {
+  if (!genAI) {
     return "AI chat unavailable. API key not configured.";
   }
 
@@ -70,11 +69,10 @@ export async function askAboutCourse(question: string, course: Course, reviews: 
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-8b",
-      contents: prompt,
-    });
-    return response.text || "No specific data found for this query.";
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text() || "No specific data found for this query.";
   } catch (error) {
     return "Service temporarily unavailable.";
   }
