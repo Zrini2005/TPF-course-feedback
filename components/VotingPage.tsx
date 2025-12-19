@@ -67,7 +67,7 @@ const VotingPage: React.FC = () => {
           background: '#f0f0f0'
         }}>
           <img 
-            src="/vote-image.jpg" 
+            src="/isAkhilGay.jpeg" 
             alt="Akhil"
             style={{
               width: '100%',

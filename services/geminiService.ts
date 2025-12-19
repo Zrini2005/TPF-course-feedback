@@ -43,7 +43,7 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
   `;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemma-3-4b" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || "Summary analysis not available.";
