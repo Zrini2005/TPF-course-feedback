@@ -1,9 +1,55 @@
 import React, { useState, useEffect } from 'react';
 
+const VOTES_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdJtPgTZHITf3U5DG2sxK3AGyLxzSANQcEBeivE9lsNNe52Uews0UzokilJedq2caZyFn6DxDdCJRv/pub?output=csv";
+const FORM_SUBMIT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeg_-texPjISwaW55zaVI5RQaA6AZKeWasnAEmg_Oah50Rrhg/formResponse";
+const FORM_ENTRY_ID = "entry.573701087";
+
 const VotingPage: React.FC = () => {
   const [hasVoted, setHasVoted] = useState(false);
   const [votes, setVotes] = useState({ yes: 0, no: 0 });
   const [userVote, setUserVote] = useState<'yes' | 'no' | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch vote counts from Google Sheet
+  const fetchVotes = async () => {
+    try {
+      const response = await fetch(VOTES_SHEET_URL);
+      const csvText = await response.text();
+      
+      console.log('Raw CSV:', csvText); // Debug
+      
+      const lines = csvText.split('\n').filter(line => line.trim());
+      
+      // Skip header, count votes
+      let yesCount = 0;
+      let noCount = 0;
+      
+      // Parse each line (Google Forms: Timestamp, Answer)
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        // Find the last comma to get the answer (timestamp might have commas)
+        const lastCommaIndex = line.lastIndexOf(',');
+        if (lastCommaIndex !== -1) {
+          const vote = line.substring(lastCommaIndex + 1)
+            .toLowerCase()
+            .trim()
+            .replace(/['"]/g, '');
+          
+          console.log(`Line ${i}: "${vote}"`); // Debug
+          
+          if (vote === 'yes') yesCount++;
+          else if (vote === 'no') noCount++;
+        }
+      }
+      
+      console.log('Final counts:', { yes: yesCount, no: noCount });
+      setVotes({ yes: yesCount, no: noCount });
+    } catch (error) {
+      console.error('Error fetching votes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check if user has already voted
@@ -13,26 +59,37 @@ const VotingPage: React.FC = () => {
       setUserVote(voted as 'yes' | 'no');
     }
 
-    // Load vote counts
-    const savedVotes = localStorage.getItem('akhil_vote_counts');
-    if (savedVotes) {
-      setVotes(JSON.parse(savedVotes));
-    }
+    // Fetch current vote counts
+    fetchVotes();
+    
+    // Poll for updates every 5 seconds
+    const interval = setInterval(fetchVotes, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleVote = (vote: 'yes' | 'no') => {
+  const handleVote = async (vote: 'yes' | 'no') => {
     if (hasVoted) return;
 
-    const newVotes = {
-      yes: votes.yes + (vote === 'yes' ? 1 : 0),
-      no: votes.no + (vote === 'no' ? 1 : 0)
-    };
-
-    setVotes(newVotes);
     setUserVote(vote);
     setHasVoted(true);
     localStorage.setItem('akhil_vote', vote);
-    localStorage.setItem('akhil_vote_counts', JSON.stringify(newVotes));
+
+    // Submit to Google Form
+    try {
+      const formData = new FormData();
+      formData.append(FORM_ENTRY_ID, vote);
+      
+      await fetch(FORM_SUBMIT_URL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors'
+      });
+      
+      // Refresh vote counts after submission
+      setTimeout(fetchVotes, 2000);
+    } catch (error) {
+      console.error('Error submitting vote:', error);
+    }
   };
 
   const totalVotes = votes.yes + votes.no;
