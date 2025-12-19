@@ -5,11 +5,17 @@ import FilterBar from './components/FilterBar';
 import CourseCard from './components/CourseCard';
 import CourseDetail from './components/CourseDetail';
 import LandingPage from './components/LandingPage';
+import VotingPage from './components/VotingPage';
 import { fetchLiveReviews } from './services/dataLoader';
 
 const FORM_URL = "https://forms.gle/zd6nTbFLMtp8dofd7";
 
 const App: React.FC = () => {
+  // Check if accessing the secret voting page
+  if (window.location.pathname === '/vote-secret-2k9x') {
+    return <VotingPage />;
+  }
+
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
   const [isLoading, setIsLoading] = useState(false);

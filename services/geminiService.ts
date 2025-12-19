@@ -44,7 +44,7 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash",
       contents: prompt,
     });
     return response.text || "Summary analysis not available.";
