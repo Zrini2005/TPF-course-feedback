@@ -28,6 +28,6 @@ This repository is configured for automatic deployment to GitHub Pages.
 1. Go to your repository **Settings** → **Pages**
 2. Under **Source**, select **GitHub Actions**
 3. Push to the `main` branch or manually trigger the workflow
-4. Your app will be available at: `https://zrini2005.github.io/TPF-course-feedback/`
+4. Your app will be available at: `https://<your-username>.github.io/TPF-course-feedback/`
 
 The deployment workflow will automatically build and deploy your app whenever you push to the `main` branch.
