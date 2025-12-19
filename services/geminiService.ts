@@ -3,9 +3,14 @@ import { GoogleGenAI } from "@google/genai";
 import { Course, Review } from "../types";
 
 // Always use process.env.API_KEY directly and exclusively.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY || '';
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 export async function getCourseSummary(course: Course, reviews: Review[]) {
+  if (!ai) {
+    return "AI summary unavailable. API key not configured.";
+  }
+
   const reviewsText = reviews.map(r => `
     [Easiness: ${r.rating}/5]
     Teaching Method: ${r.teachingMethod}
@@ -50,6 +55,10 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
 }
 
 export async function askAboutCourse(question: string, course: Course, reviews: Review[]) {
+  if (!ai) {
+    return "AI chat unavailable. API key not configured.";
+  }
+
   const context = reviews.map(r => `Teaching: ${r.teachingMethod}. Exam: ${r.examStructure}. Grading: ${r.gradingComments}. General: ${r.comment}`).join(" | ");
   const prompt = `
     Student Question: "${question}"
