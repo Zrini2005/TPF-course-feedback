@@ -58,8 +58,8 @@ const VotingPage: React.FC = () => {
         textAlign: 'center'
       }}>
         <div style={{
-          width: '150px',
-          height: '150px',
+          width: '350px',
+          height: '350px',
           margin: '0 auto 30px',
           borderRadius: '50%',
           overflow: 'hidden',

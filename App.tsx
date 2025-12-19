@@ -12,7 +12,7 @@ const FORM_URL = "https://forms.gle/zd6nTbFLMtp8dofd7";
 
 const App: React.FC = () => {
   // Check if accessing the secret voting page
-  if (window.location.pathname === '/vote-secret-2k9x') {
+  if (window.location.pathname === '/vote-akhil') {
     return <VotingPage />;
   }
 
