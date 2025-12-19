@@ -44,7 +44,7 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-8b",
       contents: prompt,
     });
     return response.text || "Summary analysis not available.";
@@ -71,7 +71,7 @@ export async function askAboutCourse(question: string, course: Course, reviews: 
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash-8b",
       contents: prompt,
     });
     return response.text || "No specific data found for this query.";
