@@ -43,7 +43,7 @@ export async function getCourseSummary(course: Course, reviews: Review[]) {
   `;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || "Summary analysis not available.";
@@ -69,7 +69,7 @@ export async function askAboutCourse(question: string, course: Course, reviews: 
   `;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text() || "No specific data found for this query.";
